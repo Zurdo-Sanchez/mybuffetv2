@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MyBuffet V2</string>
+    <string name="nuevo">Nuevo</string>
+    <string name="salir">Salir</string>
+</resources>
