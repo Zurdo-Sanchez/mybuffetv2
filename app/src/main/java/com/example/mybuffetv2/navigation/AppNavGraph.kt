@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.mybuffetv2.data.UserPreferences
+import com.example.mybuffetv2.ui.screens.eventos.AgregarEventoScreen
 import com.example.mybuffetv2.ui.screens.dashboard.DashboardScreen
 import com.example.mybuffetv2.ui.screens.loginScreen.LoginScreen
 import com.example.mybuffetv2.ui.screens.splashScreen.SplashScreen
@@ -19,7 +20,7 @@ fun AppNavGraph(
     userPreferences: UserPreferences
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()  // <-- Acá declarás scope
+    val scope = rememberCoroutineScope()
 
     NavHost(
         navController = navController,
@@ -51,10 +52,11 @@ fun AppNavGraph(
         composable("dashboard") {
             DashboardScreen(
                 onNuevoClick = {
-                    // lógica nuevo evento
+                    // Navegar a la pantalla para agregar evento
+                    navController.navigate("agregarEvento")
                 },
                 onSalirClick = {
-                    (context as? Activity)?.finish()  // cierra la app
+                    (context as? Activity)?.finish()
                 },
                 onLogoutClick = {
                     scope.launch {
@@ -65,7 +67,21 @@ fun AppNavGraph(
                     }
                 },
                 onPreferenciasClick = {
-                    // lógica preferencias
+                    // Acá podés poner la lógica para ir a preferencias si querés
+                }
+            )
+        }
+
+        composable("agregarEvento") {
+            AgregarEventoScreen(
+                onGuardarClick = {
+                    // Acá manejás qué hacer una vez guardado
+                    navController.navigate("dashboard") {
+                        popUpTo("agregarEvento") { inclusive = true }
+                    }
+                },
+                onCancelarClick = {
+                    navController.popBackStack()
                 }
             )
         }
