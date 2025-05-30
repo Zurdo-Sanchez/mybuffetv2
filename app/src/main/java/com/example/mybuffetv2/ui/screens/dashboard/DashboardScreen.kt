@@ -14,15 +14,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.mybuffetv2.model.EventoSeleccionadoManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import androidx.compose.material3.TextFieldDefaults
+import com.example.mybuffetv2.model.Evento
 
 
 enum class EstadoFiltro(val displayName: String, val estadoCodigo: Int) {
     TODAS("Todas", -1),
-    ACTIVA("Activa", 0),
-    CERRADA("Cerrada", 1),
+    ACTIVA("Activa", 1),
+    CERRADA("Cerrada", 0),
     BORRADA("Borrada", 8)
 }
 
@@ -38,6 +41,7 @@ data class Evento(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
+    navController: NavController,
     onNuevoClick: () -> Unit,
     onSalirClick: () -> Unit,
     onPreferenciasClick: () -> Unit,
@@ -202,7 +206,11 @@ fun DashboardScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(vertical = 6.dp)
-                                        .clickable { /* acción al tocar evento */ },
+                                        .clickable {
+                                            // Seleccionar el evento y navegar
+                                            EventoSeleccionadoManager.seleccionarEvento(evento)
+                                            navController.navigate("eventoDetalle")
+                                        },
                                     elevation = CardDefaults.cardElevation(6.dp),
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceVariant

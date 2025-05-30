@@ -1,5 +1,9 @@
 package com.example.mybuffetv2.model
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+
 data class Evento(
     val id: String = "",
     val nombre: String = "",
@@ -23,3 +27,16 @@ data class Usuario(
     val nombre: String = ""
 )
 
+// Singleton para mantener el evento seleccionado con estado mutable de Compose
+object EventoSeleccionadoManager {
+    var eventoSeleccionado by mutableStateOf<Evento?>(null)
+        private set
+
+    fun seleccionarEvento(evento: Evento) {
+        eventoSeleccionado = evento
+    }
+
+    fun limpiarSeleccion() {
+        eventoSeleccionado = null
+    }
+}
