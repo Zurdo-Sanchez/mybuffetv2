@@ -1,6 +1,7 @@
 package com.example.mybuffetv2.navigation
 
 import android.app.Activity
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -8,8 +9,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.mybuffetv2.data.UserPreferences
-import com.example.mybuffetv2.ui.screens.eventos.AgregarEventoScreen
+import com.example.mybuffetv2.model.EventoSeleccionadoManager
 import com.example.mybuffetv2.ui.screens.dashboard.DashboardScreen
+import com.example.mybuffetv2.ui.screens.eventos.AgregarEventoScreen
+import com.example.mybuffetv2.ui.screens.eventos.EventoDetalleScreen
 import com.example.mybuffetv2.ui.screens.loginScreen.LoginScreen
 import com.example.mybuffetv2.ui.screens.splashScreen.SplashScreen
 import kotlinx.coroutines.launch
@@ -51,8 +54,8 @@ fun AppNavGraph(
 
         composable("dashboard") {
             DashboardScreen(
+                navController = navController,
                 onNuevoClick = {
-                    // Navegar a la pantalla para agregar evento
                     navController.navigate("agregarEvento")
                 },
                 onSalirClick = {
@@ -67,7 +70,7 @@ fun AppNavGraph(
                     }
                 },
                 onPreferenciasClick = {
-                    // Acá podés poner la lógica para ir a preferencias si querés
+                    // Navegación a preferencias si querés
                 }
             )
         }
@@ -75,7 +78,6 @@ fun AppNavGraph(
         composable("agregarEvento") {
             AgregarEventoScreen(
                 onGuardarClick = {
-                    // Acá manejás qué hacer una vez guardado
                     navController.navigate("dashboard") {
                         popUpTo("agregarEvento") { inclusive = true }
                     }
@@ -84,6 +86,26 @@ fun AppNavGraph(
                     navController.popBackStack()
                 }
             )
+        }
+
+        composable("eventoDetalle") {
+            val evento = EventoSeleccionadoManager.eventoSeleccionado
+            if (evento != null) {
+                EventoDetalleScreen(
+                    eventoId = evento.id,
+                    onVolver = {
+                        EventoSeleccionadoManager.limpiarSeleccion()
+                        navController.popBackStack()
+                    },
+                    onEventoActualizado = {},
+                    onEventoBorrado = {navController.navigate("dashboard")},
+                    onIrAlBuffet= {},
+                    onVerRecaudacion= {},
+                    onProductos= {}
+                )
+            } else {
+                Text("No hay evento seleccionado")
+            }
         }
     }
 }
