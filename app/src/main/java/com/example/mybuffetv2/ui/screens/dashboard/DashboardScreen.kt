@@ -21,7 +21,6 @@ import com.google.firebase.firestore.ListenerRegistration
 import androidx.compose.material3.TextFieldDefaults
 import com.example.mybuffetv2.model.Evento
 
-
 enum class EstadoFiltro(val displayName: String, val estadoCodigo: Int) {
     TODAS("Todas", -1),
     ACTIVA("Activa", 1),
@@ -166,7 +165,12 @@ fun DashboardScreen(
                             FilterChip(
                                 selected = filtroSeleccionado == estado,
                                 onClick = { filtroSeleccionado = estado },
-                                label = { Text(estado.displayName) },
+                                label = {
+                                    Text(
+                                        estado.displayName,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
                                     selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
