@@ -24,6 +24,15 @@ data class Producto(
     val eventoId: String = ""
 )
 
+data class ProductoPedido(
+    val id: String = "",
+    val nombre: String = "",
+    val precio: Int = 0,
+    val cantidad: Int = 0,
+    val eventoId: String = "",
+    val activo: Boolean = true
+)
+
 data class Usuario(
     val id: String = "",
     val email: String = "",

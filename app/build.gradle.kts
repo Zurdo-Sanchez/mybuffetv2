@@ -81,6 +81,7 @@ dependencies {
 
     implementation ("androidx.compose.ui:ui:$compose_version")
     implementation ("androidx.compose.material3:material3:1.1.0")
+    implementation ("androidx.compose.runtime:runtime:1.5.0")
 
 
 
