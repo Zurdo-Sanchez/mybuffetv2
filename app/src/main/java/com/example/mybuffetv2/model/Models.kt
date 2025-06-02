@@ -15,10 +15,13 @@ data class Evento(
 
 data class Producto(
     val id: String = "",
+    val estado: Int= 1,
     val nombre: String = "",
     val precio: Double = 0.0,
+    val coste: Double = 0.0,
     val cantidad: Int = 0,
-    val imagenUrl: String = ""
+    val imagenUrl: String = "",
+    val eventoId: String = ""
 )
 
 data class Usuario(
@@ -38,5 +41,19 @@ object EventoSeleccionadoManager {
 
     fun limpiarSeleccion() {
         eventoSeleccionado = null
+    }
+}
+
+// Singleton para mantener el producto seleccionado con estado mutable de Compose
+object ProductoSeleccionadoManager {
+    var productoSeleccionado by mutableStateOf<Producto?>(null)
+        private set
+
+    fun seleccionarProducto(producto: Producto) {
+        productoSeleccionado = producto
+    }
+
+    fun limpiarSeleccion() {
+        productoSeleccionado = null
     }
 }
