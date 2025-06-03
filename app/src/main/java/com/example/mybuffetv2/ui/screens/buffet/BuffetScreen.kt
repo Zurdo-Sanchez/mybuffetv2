@@ -16,9 +16,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mybuffetv2.viewmodel.PedidoViewModel
 import com.example.mybuffetv2.model.EventoSeleccionadoManager.eventoSeleccionado
+import com.example.mybuffetv2.model.ProductoPedido
+import com.example.mybuffetv2.viewmodel.PedidoViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuffetScreen(
     viewModel: PedidoViewModel = viewModel(),
@@ -27,113 +30,229 @@ fun BuffetScreen(
     val evento = eventoSeleccionado
     val nombreEvento = evento?.nombre ?: "Sin evento seleccionado"
 
-    // Guardamos cantidades por producto id
     val cantidades = remember { mutableStateMapOf<String, Int>() }
+    var showConfirmDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        Text(
-            text = nombreEvento,
-            fontSize = 30.sp,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.headlineMedium
-        )
+    val total = cantidades.entries.sumOf { (id, cantidad) ->
+        val producto = productos.find { it.id == id }
+        (producto?.precio ?: 0) * cantidad
+    }
 
-        Spacer(modifier = Modifier.height(20.dp))
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
-        // Totalizador y botón finalizar
-        Box(
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 12.dp)
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            // Total a la izquierda
-            val total = cantidades.entries.sumOf { (id, cantidad) ->
-                val producto = productos.find { it.id == id }
-                (producto?.precio ?: 0) * cantidad
-            }
             Text(
-                text = "Total: €$total",
-                fontSize = 20.sp,
+                text = nombreEvento,
+                fontSize = 30.sp,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterStart)
+                style = MaterialTheme.typography.headlineMedium
             )
 
-            // Botón a la derecha
-            Button(
-                onClick = {
-                    // Acción para finalizar pedido
-                },
-                modifier = Modifier.align(Alignment.CenterEnd)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 12.dp)
             ) {
-                Text(text = "Finalizar pedido")
-            }
-        }
+                Text(
+                    text = "Total: €$total",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(productos) { producto ->
-                val cantidadSeleccionada = cantidades.getOrElse(producto.id) { 0 }
-
-                Card(
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .fillMaxWidth()
-                        .clickable {
-                            cantidades[producto.id] = cantidadSeleccionada + 1
-                        },
-                    elevation = CardDefaults.cardElevation(2.dp)
+                Button(
+                    onClick = {
+                        if (total > 0) {
+                            showConfirmDialog = true
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.CenterEnd)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(6.dp)
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.SpaceEvenly,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = producto.nombre,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "€${producto.precio}",
-                            fontSize = 14.sp,
-                            fontStyle = FontStyle.Italic
-                        )
+                    Text(text = "Finalizar pedido")
+                }
+            }
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            IconButton(onClick = {
-                                if (cantidadSeleccionada > 0) {
-                                    cantidades[producto.id] = cantidadSeleccionada - 1
-                                }
-                            }) {
-                                Icon(Icons.Default.Remove, contentDescription = "Disminuir")
-                            }
-                            Text(text = cantidadSeleccionada.toString(), fontSize = 14.sp)
-                            IconButton(onClick = {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(horizontal = 8.dp)
+            ) {
+                items(productos) { producto ->
+                    val cantidadSeleccionada = cantidades.getOrElse(producto.id) { 0 }
+
+                    Card(
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .fillMaxWidth()
+                            .clickable {
                                 cantidades[producto.id] = cantidadSeleccionada + 1
-                            }) {
-                                Icon(Icons.Default.Add, contentDescription = "Aumentar")
+                            },
+                        elevation = CardDefaults.cardElevation(2.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(6.dp)
+                                .fillMaxSize(),
+                            verticalArrangement = Arrangement.SpaceEvenly,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = producto.nombre,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "€${producto.precio}",
+                                fontSize = 14.sp,
+                                fontStyle = FontStyle.Italic
+                            )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                IconButton(onClick = {
+                                    if (cantidadSeleccionada > 0) {
+                                        cantidades[producto.id] = cantidadSeleccionada - 1
+                                    }
+                                }) {
+                                    Icon(Icons.Default.Remove, contentDescription = "Disminuir")
+                                }
+                                Text(text = cantidadSeleccionada.toString(), fontSize = 14.sp)
+                                IconButton(onClick = {
+                                    cantidades[producto.id] = cantidadSeleccionada + 1
+                                }) {
+                                    Icon(Icons.Default.Add, contentDescription = "Aumentar")
+                                }
                             }
                         }
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    // Acción para volver, si la tenés
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
+            ) {
+                Text(text = "Volver")
+            }
+        }
+
+        if (showConfirmDialog) {
+            AlertDialog(
+                onDismissRequest = { showConfirmDialog = false },
+                title = { Text("Confirmar pedido") },
+                text = {
+                    Column {
+                        cantidades.entries.filter { it.value > 0 }.forEach { (id, cantidad) ->
+                            val producto = productos.find { it.id == id }
+                            if (producto != null) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = producto.nombre,
+                                        fontSize = 16.sp,
+                                        modifier = Modifier.weight(0.5f)
+                                    )
+                                    Text(
+                                        text = "x $cantidad",
+                                        fontSize = 16.sp,
+                                        modifier = Modifier.weight(0.2f),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Text(
+                                        text = "€${producto.precio * cantidad}",
+                                        fontSize = 16.sp,
+                                        modifier = Modifier.weight(0.3f),
+                                        textAlign = TextAlign.End
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Text("Total: €$total", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val listaProductosPedido = cantidades.entries.flatMap { (id, cantidad) ->
+                                val producto = productos.find { it.id == id }
+                                if (producto != null && cantidad > 0) {
+                                    List(cantidad) {
+                                        ProductoPedido(
+                                            id = producto.id,
+                                            nombre = producto.nombre,
+                                            precio = producto.precio,
+                                            cantidad = 1,
+                                            eventoId = evento?.id ?: "",
+                                            activo = true
+                                        )
+                                    }
+                                } else {
+                                    emptyList()
+                                }
+                            }
+
+                            viewModel.registrarPedidos(
+                                listaProductosPedido,
+                                onSuccess = {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Pedido registrado correctamente")
+                                    }
+                                    cantidades.clear()
+                                    showConfirmDialog = false
+                                },
+                                onError = { e ->
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Error: ${e.message ?: "Desconocido"}")
+                                    }
+                                }
+                            )
+                        }
+                    ) {
+                        Text("Confirmar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showConfirmDialog = false }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
         }
     }
 }

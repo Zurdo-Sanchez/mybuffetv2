@@ -8,16 +8,20 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+
+
 
 class PedidoViewModel : ViewModel() {
 
     private val productosCollection = FirebaseFirestore.getInstance().collection("productos")
-
+    private val firestore = FirebaseFirestore.getInstance()
     private val _productos = MutableStateFlow<List<ProductoPedido>>(emptyList())
     val productos: StateFlow<List<ProductoPedido>> = _productos
 
     private var listenerRegistration: ListenerRegistration? = null
+
 
     init {
         escucharTodosLosProductos()
@@ -50,6 +54,34 @@ class PedidoViewModel : ViewModel() {
             }
         }
     }
+
+    fun registrarPedidos(
+        listaPedidos: List<ProductoPedido>,
+        onSuccess: () -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val ventasCollection = firestore.collection("ventas")
+        var pendientes = listaPedidos.size
+        if (pendientes == 0) {
+            onSuccess() // nada que registrar
+            return
+        }
+        listaPedidos.forEach { pedido ->
+            val ref = ventasCollection.document()
+            val pedidoConId = pedido.copy(id = ref.id)
+            ref.set(pedidoConId)
+                .addOnSuccessListener {
+                    pendientes--
+                    if (pendientes == 0) {
+                        onSuccess()
+                    }
+                }
+                .addOnFailureListener { e ->
+                    onError(e)
+                }
+        }
+    }
+
 
     override fun onCleared() {
         super.onCleared()
