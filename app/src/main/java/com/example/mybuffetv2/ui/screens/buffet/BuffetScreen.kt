@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mybuffetv2.model.EventoSeleccionadoManager.eventoSeleccionado
 import com.example.mybuffetv2.model.ProductoPedido
+import com.example.mybuffetv2.navigation.Routes
 import com.example.mybuffetv2.viewmodel.PedidoViewModel
 import kotlinx.coroutines.launch
 
@@ -25,7 +26,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun BuffetScreen(
     viewModel: PedidoViewModel = viewModel(),
+    onVolver: () -> Unit,
 ) {
+
     val productos by viewModel.productos.collectAsState()
     val evento = eventoSeleccionado
     val nombreEvento = evento?.nombre ?: "Sin evento seleccionado"
@@ -154,7 +157,7 @@ fun BuffetScreen(
 
             Button(
                 onClick = {
-                    // Acción para volver, si la tenés
+                   onVolver()
                 },
                 modifier = Modifier
                     .fillMaxWidth()

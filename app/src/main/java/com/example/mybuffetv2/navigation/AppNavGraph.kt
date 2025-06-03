@@ -184,7 +184,7 @@ fun AppNavGraph(
         }
         composable(Routes.BUFFET_SCREEN) {
             BuffetScreen(
-
+                onVolver = {navController.navigate(Routes.EVENTO_DETALLE)}
             )
         }
     }
