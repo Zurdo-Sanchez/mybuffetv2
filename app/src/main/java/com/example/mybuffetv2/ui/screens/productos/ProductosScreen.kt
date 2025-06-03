@@ -22,7 +22,6 @@ import com.example.mybuffetv2.model.EventoSeleccionadoManager
 import com.example.mybuffetv2.model.ProductoSeleccionadoManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductosScreen(
@@ -33,7 +32,6 @@ fun ProductosScreen(
     val productos = remember { mutableStateListOf<Producto>() }
     val eventoActual = EventoSeleccionadoManager.eventoSeleccionado
 
-    // Obtener estado del evento o 0 por defecto
     val estadoEvento = eventoActual?.estado ?: 0
 
     var estadoFiltro by remember { mutableStateOf(1) } // 1 = Activos reales
@@ -69,14 +67,20 @@ fun ProductosScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { /* vacío a propósito */ },
+                title = {
+                    Text(
+                        text = eventoActual?.nombre ?: "",
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1
+                    )
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
             )
         },
         floatingActionButton = {
-            // Solo mostrar si el evento NO está en estado 0 ni 8
             if (estadoEvento != 0 && estadoEvento != 8) {
-                if (estadoFiltro == 1) { // Solo en activos
+                if (estadoFiltro == 1) {
                     FloatingActionButton(
                         onClick = onAgregarProductoClick,
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -112,42 +116,36 @@ fun ProductosScreen(
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            Column(
+            // Ya no mostramos el nombre del evento aquí porque está arriba en la top bar
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = "PRODUCTOS",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                Text(
-                    text = eventoActual?.nombre ?: "",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                FilterChip(
+                    selected = estadoFiltro == 1,
+                    onClick = { estadoFiltro = 1 },
+                    label = { Text("Activos") },
+                    modifier = Modifier.padding(end = 8.dp)
                 )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = "PRODUCTOS",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    FilterChip(
-                        selected = estadoFiltro == 1,
-                        onClick = { estadoFiltro = 1 },
-                        label = { Text("Activos") },
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
 
-                    FilterChip(
-                        selected = estadoFiltro == 8,
-                        onClick = { estadoFiltro = 8 },
-                        label = { Text("Borrados") }
-                    )
-                }
+                FilterChip(
+                    selected = estadoFiltro == 8,
+                    onClick = { estadoFiltro = 8 },
+                    label = { Text("Borrados") }
+                )
             }
 
             Spacer(Modifier.height(8.dp))
@@ -200,7 +198,6 @@ fun ProductosScreen(
                                     modifier = Modifier.padding(start = 16.dp)
                                 )
                                 Box {
-                                    // Mostrar menú solo si evento NO está en estado 0 ni 8
                                     if (estadoEvento != 0 && estadoEvento != 8) {
                                         IconButton(onClick = { expandedMenu = true }) {
                                             Icon(Icons.Default.MoreVert, contentDescription = "Menú opciones")
@@ -298,3 +295,4 @@ fun ProductosScreen(
         }
     }
 }
+

@@ -19,6 +19,7 @@ import com.example.mybuffetv2.ui.screens.productos.AgregarProductoScreen
 import com.example.mybuffetv2.ui.screens.productos.EditarProductoScreen
 import com.example.mybuffetv2.ui.screens.productos.ProductosScreen
 import com.example.mybuffetv2.ui.screens.splashScreen.SplashScreen
+import com.example.mybuffetv2.ui.screens.buffet.BuffetScreen
 import kotlinx.coroutines.launch
 
 object Routes {
@@ -30,6 +31,8 @@ object Routes {
     const val PRODUCTOS_SCREEN = "productos_screen"
     const val AGREGAR_PRODUCTO = "agregarProducto"
     const val EDITAR_PRODUCTO = "editarProducto"
+    const val BUFFET_SCREEN = "buffet"
+
 }
 
 @Composable
@@ -168,7 +171,7 @@ fun AppNavGraph(
                         }
                     },
                     onIrAlBuffet = {
-                        // Navegación a recaudación si querés después
+                        navController.navigate(Routes.BUFFET_SCREEN)
                     },
                     onVerRecaudacion = {
                         // Navegación a recaudación si querés después
@@ -178,6 +181,11 @@ fun AppNavGraph(
                     }
                 )
             }
+        }
+        composable(Routes.BUFFET_SCREEN) {
+            BuffetScreen(
+                onVolver = {navController.navigate(Routes.EVENTO_DETALLE)}
+            )
         }
     }
 }

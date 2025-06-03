@@ -23,6 +23,26 @@ data class Producto(
     val imagenUrl: String = "",
     val eventoId: String = ""
 )
+data class ProductoVenta(
+    val id: String = "",
+    val id_producto: String = "",
+    val id_evento: String = "",
+    val precio: Double = 0.0,
+    val coste: Double = 0.0,
+    val cantidad: Int = 0,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
+data class ProductoPedido(
+    val id: String = "",
+    val nombre: String = "",
+    val coste: Int = 0,
+    val precio: Int = 0,
+    val cantidad: Int = 0,
+    val eventoId: String = "",
+    val activo: Boolean = true,
+
+)
 
 data class Usuario(
     val id: String = "",

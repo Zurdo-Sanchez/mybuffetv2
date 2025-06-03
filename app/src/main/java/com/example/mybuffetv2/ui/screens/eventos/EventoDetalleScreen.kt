@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mybuffetv2.model.Evento
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +43,7 @@ fun EventoDetalleScreen(
     var mostrarConfirmarBorrar by remember { mutableStateOf(false) }
     var mostrarConfirmarTerminar by remember { mutableStateOf(false) }
     var menuExpandido by remember { mutableStateOf(false) }
-    var recaudacion by remember { mutableStateOf(200) } // Lo podés cargar dinámico si querés
+    var recaudacion by remember { mutableStateOf(0.0) }
 
     // Función para cargar evento desde Firestore
     fun cargarEvento() {
@@ -69,10 +70,33 @@ fun EventoDetalleScreen(
         cargarEvento()
     }
 
+    // Listener dinámico para recaudación
+    LaunchedEffect(eventoId) {
+        val listener = db.collection("ventas")
+            .whereEqualTo("eventoId", eventoId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    mostrandoMensaje = "Error al cargar la recaudación"
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    var suma = 0.0
+                    for (document in snapshot.documents) {
+                        val monto = document.getDouble("precio") ?: 0.0
+                        suma += monto
+                    }
+                    recaudacion = suma
+                }
+            }
+        // Listener se quita cuando se recomposa
+        awaitCancellation()
+        listener.remove()
+    }
+
     // Mostrar mensaje temporizado
     LaunchedEffect(mostrandoMensaje) {
         if (mostrandoMensaje != null) {
-            delay(3000)
+            kotlinx.coroutines.delay(3000)
             mostrandoMensaje = null
         }
     }
@@ -251,7 +275,7 @@ fun EventoDetalleScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = "Recaudación €$recaudacion",
+            text = "Recaudación €${"%.2f".format(recaudacion)}",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 12.dp)

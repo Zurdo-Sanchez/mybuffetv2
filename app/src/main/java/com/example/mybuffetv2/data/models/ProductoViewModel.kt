@@ -1,4 +1,4 @@
-package com.example.mybuffetv2.model
+package com.example.mybuffetv2.data.models
 
 import androidx.lifecycle.ViewModel
 import com.example.mybuffetv2.model.Producto

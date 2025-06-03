@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mybuffetv2.model.Producto
 import com.example.mybuffetv2.model.EventoSeleccionadoManager
-import com.example.mybuffetv2.model.ProductoViewModel
+import com.example.mybuffetv2.data.models.ProductoViewModel
 import androidx.compose.foundation.text.KeyboardOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
