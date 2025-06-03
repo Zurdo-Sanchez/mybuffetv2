@@ -29,7 +29,7 @@ fun BuffetScreen(
     onVolver: () -> Unit,
 ) {
 
-    val productos by viewModel.productos.collectAsState()
+    val productos by viewModel.productosEvento.collectAsState()
     val evento = eventoSeleccionado
     val nombreEvento = evento?.nombre ?: "Sin evento seleccionado"
 
@@ -38,7 +38,7 @@ fun BuffetScreen(
 
     val total = cantidades.entries.sumOf { (id, cantidad) ->
         val producto = productos.find { it.id == id }
-        (producto?.precio ?: 0) * cantidad
+        (producto?.precio ?: 0.0) * cantidad
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -125,7 +125,7 @@ fun BuffetScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "€${producto.precio}",
+                                text = "€${String.format("%.2f", producto.precio)}",
                                 fontSize = 14.sp,
                                 fontStyle = FontStyle.Italic
                             )
@@ -192,7 +192,7 @@ fun BuffetScreen(
                                         textAlign = TextAlign.Center
                                     )
                                     Text(
-                                        text = "€${producto.precio * cantidad}",
+                                        text = "€${String.format("%.2f", producto.precio * cantidad)}",
                                         fontSize = 16.sp,
                                         modifier = Modifier.weight(0.3f),
                                         textAlign = TextAlign.End

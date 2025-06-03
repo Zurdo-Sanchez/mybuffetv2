@@ -7,8 +7,11 @@ import com.example.mybuffetv2.model.EventoSeleccionadoManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
@@ -18,7 +21,19 @@ class PedidoViewModel : ViewModel() {
     private val productosCollection = FirebaseFirestore.getInstance().collection("productos")
     private val firestore = FirebaseFirestore.getInstance()
     private val _productos = MutableStateFlow<List<ProductoPedido>>(emptyList())
+
     val productos: StateFlow<List<ProductoPedido>> = _productos
+
+    val productosEvento: StateFlow<List<ProductoPedido>> = _productos
+        .map { lista ->
+            val eventoId = EventoSeleccionadoManager.eventoSeleccionado?.id
+            lista.filter { it.eventoId == eventoId }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     private var listenerRegistration: ListenerRegistration? = null
 
@@ -39,7 +54,7 @@ class PedidoViewModel : ViewModel() {
                     ProductoPedido(
                         id = doc.id,
                         nombre = doc.getString("nombre") ?: "",
-                        precio = (doc.getLong("precio") ?: 0L).toInt(),
+                        precio = doc.getDouble("precio") ?: 0.0,
                         cantidad = (doc.getLong("cantidad") ?: 0L).toInt(),
                         eventoId = doc.getString("eventoId") ?: "",
                         activo = (doc.getLong("estado") ?: 0L) == 1L

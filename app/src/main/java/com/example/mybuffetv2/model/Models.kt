@@ -36,8 +36,8 @@ data class ProductoVenta(
 data class ProductoPedido(
     val id: String = "",
     val nombre: String = "",
-    val coste: Int = 0,
-    val precio: Int = 0,
+    val coste: Double = 0.0,
+    val precio: Double = 0.0,
     val cantidad: Int = 0,
     val eventoId: String = "",
     val activo: Boolean = true,
