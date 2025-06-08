@@ -5,12 +5,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.mybuffetv2.data.UserPreferences
 import com.example.mybuffetv2.model.EventoSeleccionadoManager
 import com.example.mybuffetv2.model.ProductoSeleccionadoManager
+import com.example.mybuffetv2.ui.screens.RecaudacionScreen
 import com.example.mybuffetv2.ui.screens.dashboard.DashboardScreen
 import com.example.mybuffetv2.ui.screens.eventos.AgregarEventoScreen
 import com.example.mybuffetv2.ui.screens.eventos.EventoDetalleScreen
@@ -20,6 +22,7 @@ import com.example.mybuffetv2.ui.screens.productos.EditarProductoScreen
 import com.example.mybuffetv2.ui.screens.productos.ProductosScreen
 import com.example.mybuffetv2.ui.screens.splashScreen.SplashScreen
 import com.example.mybuffetv2.ui.screens.buffet.BuffetScreen
+import com.example.mybuffetv2.viewmodel.RecaudacionViewModel
 import kotlinx.coroutines.launch
 
 object Routes {
@@ -32,7 +35,7 @@ object Routes {
     const val AGREGAR_PRODUCTO = "agregarProducto"
     const val EDITAR_PRODUCTO = "editarProducto"
     const val BUFFET_SCREEN = "buffet"
-
+    const val RECAUDACIONES ="recaudacion"
 }
 
 @Composable
@@ -174,7 +177,7 @@ fun AppNavGraph(
                         navController.navigate(Routes.BUFFET_SCREEN)
                     },
                     onVerRecaudacion = {
-                        // Navegación a recaudación si querés después
+                        navController.navigate(Routes.RECAUDACIONES)
                     },
                     onProductos = {
                         navController.navigate(Routes.PRODUCTOS_SCREEN)
@@ -186,6 +189,13 @@ fun AppNavGraph(
             BuffetScreen(
                 onVolver = {navController.navigate(Routes.EVENTO_DETALLE)}
             )
+        }
+        composable(Routes.RECAUDACIONES) {
+            val viewModel: RecaudacionViewModel = viewModel()
+            RecaudacionScreen(
+                viewModel = viewModel,
+                onVolver = {navController.navigate(Routes.EVENTO_DETALLE)}
+                )
         }
     }
 }

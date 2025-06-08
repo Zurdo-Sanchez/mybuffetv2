@@ -1,5 +1,6 @@
 package com.example.mybuffetv2.model
 
+import android.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -43,6 +44,19 @@ data class ProductoPedido(
     val activo: Boolean = true,
 
 )
+
+data class Compra(
+    val id: String = "",
+    val activo: Boolean = false,
+    val nombre: String = "",
+    val cantidad: Int = 0,
+    val coste: Double = 0.0,
+    val precio: Double =0.0,
+    val eventoId: String = "",
+    val fechaHora: Long = 0L
+) {
+    val total get() = cantidad * precio
+}
 
 data class Usuario(
     val id: String = "",
