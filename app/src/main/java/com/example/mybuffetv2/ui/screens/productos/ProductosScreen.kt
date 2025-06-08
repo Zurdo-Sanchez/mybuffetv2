@@ -95,16 +95,15 @@ fun ProductosScreen(
         },
         bottomBar = {
             Surface(
-                tonalElevation = 8.dp,
-                shadowElevation = 4.dp,
+               shadowElevation = 4.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
                     onClick = onVolverClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    shape = RoundedCornerShape(12.dp)
+                        .padding(top = 8.dp, bottom = 8.dp)
+                        .navigationBarsPadding()
                 ) {
                     Text("Volver")
                 }

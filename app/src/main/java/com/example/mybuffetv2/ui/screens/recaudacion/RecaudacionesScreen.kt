@@ -12,6 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.foundation.layout.navigationBarsPadding
 import com.example.mybuffetv2.model.EventoSeleccionadoManager.eventoSeleccionado
 import com.example.mybuffetv2.viewmodel.RecaudacionViewModel
 
@@ -36,6 +39,7 @@ fun RecaudacionScreen(viewModel: RecaudacionViewModel, onVolver: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
+                    .navigationBarsPadding() // ⬅️ Esto evita el solapamiento
             ) {
                 Text("Volver")
             }
@@ -52,7 +56,7 @@ fun RecaudacionScreen(viewModel: RecaudacionViewModel, onVolver: () -> Unit) {
                 fontSize = 30.sp,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
