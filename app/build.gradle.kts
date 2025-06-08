@@ -1,3 +1,4 @@
+val compose_version = "1.4.3"
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -10,7 +11,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.mybuffetv2"
+        applicationId = "com.zet4.mybuffetv2"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -50,21 +51,39 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     // Jetpack Compose
-    implementation(platform(libs.androidx.compose.bom)) // BOM: evita poner versiones a mano
+    implementation(platform(libs.androidx.compose.bom)) // BOM para Compose
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3) // Solo una línea con BOM es suficiente
+    implementation(libs.androidx.material3) // Material3 con BOM
 
     // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
-    // Firebase BOM + Analytics
+    // Firebase BOM (una sola vez)
     implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+
+    // Firebase Analytics y Firestore
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     // DataStore Preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.30.1")
+    implementation ("androidx.compose.ui:ui:$compose_version")
+    implementation ("androidx.compose.material:material:$compose_version")
+    implementation ("androidx.compose.ui:ui-tooling-preview:$compose_version")
+    implementation ("androidx.compose.material:material-icons-extended:$compose_version")
+    implementation ("androidx.activity:activity-compose:1.7.2")
+
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+    implementation ("androidx.compose.ui:ui:$compose_version")
+    implementation ("androidx.compose.material3:material3:1.1.0")
+    implementation ("androidx.compose.runtime:runtime:1.5.0")
+
+
 
     // Tests
     testImplementation(libs.junit)
