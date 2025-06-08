@@ -342,6 +342,7 @@ fun EventoDetalleScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp, bottom = 8.dp)
+                .navigationBarsPadding()
         ) {
             Text("Volver")
         }
