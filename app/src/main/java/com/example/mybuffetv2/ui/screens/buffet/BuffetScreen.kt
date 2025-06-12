@@ -100,7 +100,7 @@ fun BuffetScreen(
                     .weight(1f)
                     .padding(horizontal = 8.dp)
             ) {
-                items(productos) { producto ->
+                items(productos.sortedBy { it.nombre }) { producto ->
                     val cantidadSeleccionada = cantidades.getOrElse(producto.id) { 0 }
 
                     Card(
